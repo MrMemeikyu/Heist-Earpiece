@@ -115,7 +115,7 @@ func select_group():
 		number = randi_range(0,5)
 		value = sort[words[number*10]]
 		value = value.left(value.length() - 1)
-		if value in value_list:
+		if value in value_list or value == null:
 			value = sort[words[dupe_placeholder*10]]
 			dupe_placeholder = dupe_placeholder - 1
 			value = value.left(value.length() - 1)
@@ -151,3 +151,31 @@ func _ready():
 	button_list.shuffle()
 	print(button_list)
 	chosen_group = group_list[randi_range(0,3)]
+	button()
+
+func button():
+	var butt_collection = []
+	var matching = []
+	var distancex = 50
+	var distancey = 50
+	var text = ''
+	for i in range(16):
+		var butt = Button.new()
+		text = str(button_list[i]) #-1?
+		add_child(butt)
+		butt.set_text(text) #-1?
+		butt.set_custom_minimum_size(Vector2(240, 100))
+		butt.set_global_position(Vector2(distancex, distancey))
+		if distancex == 875:
+			distancex = 50
+			distancey = distancey + 150
+		else:
+			distancex = distancex + 275
+		butt_collection.append(butt)
+		#if sort[text] == chosen_group:
+			#matching.append(i)
+		print(i)
+	print(matching)
+	print(button_list)
+		
+		
