@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://deiija7x3likk"]
+
+[ext_resource type="Script" path="res://earpiece.gd" id="1_b3utm"]
+
+[node name="Earpiece" type="Node2D"]
+script = ExtResource("1_b3utm")
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 4.0
+offset_top = 1.0
+offset_right = 1155.0
+offset_bottom = 647.0
+
+[node name="CategoryLabel" type="RichTextLabel" parent="Panel"]
+layout_mode = 0
+offset_left = 453.0
+offset_top = 8.0
+offset_right = 770.0
+offset_bottom = 48.0
+text = "Category Label"
+metadata/_edit_group_ = true
