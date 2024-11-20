@@ -1,4 +1,57 @@
 extends Node2D
+#variables for server connection
+var api_version = "1.02"
+var client_type = "godot"
+var role = "earpiece"
+var socket := WebSocketPeer.new()
+var connected := false
+
+func log_message(message: String) -> void:
+	var time := "[color=#aaaaaa] %s |[/color] " % Time.get_time_string_from_system()
+	print(time + message)
+
+func _process(_delta: float) -> void:
+	socket.poll()
+
+	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+		while socket.get_available_packet_count():
+			log_message(socket.get_packet().get_string_from_ascii())
+
+func _exit_tree() -> void:
+	socket.close()
+
+func send(message: Dictionary):
+	#socket.put_packet(message.to_utf8_buffer())
+	message["role"] = "earpiece"
+	message["version"] = api_version
+	socket.send_text(JSON.stringify(message))
+
+func _connection_button_pressed() -> void:
+	var websocket_url := "ws://" + str($Connection_Panel/LineEdit.get_text()) + ":9876"
+	print(websocket_url)
+	if socket.connect_to_url(websocket_url) != OK:
+		log_message("Unable to connect.")
+		set_process(false)
+		$Connection_Panel/RichTextLabel.set_text('Unable to connect.')
+	else:
+		var state = socket.get_ready_state()
+
+		while state == WebSocketPeer.STATE_CONNECTING:
+			state = socket.get_ready_state() 
+			socket.poll()
+		if state == WebSocketPeer.STATE_OPEN:
+			connected = true
+			#initial connection string - sub "lockpick" for selected role
+			var instruction = {"action":"join"}
+			send(instruction)
+			print("Connected!")
+			$Connection_Panel/RichTextLabel.set_text('Connected!')
+			$Panel2.set_visible(true)
+			$Connection_Panel.set_visible(false)
+
+#moving is more of a next lesson activity
+
+#variables for minigame
 var categories = ["animals", "mammals", "colours", "birds", "feelings", "food and drink", "places", "time and seasons", "cold or cool", "hot or warm"]
 const words = {"Duck":["animals","birds", "food and drink"], 
 			 "Dog":["animals","mammals", "feelings"], 
@@ -40,14 +93,18 @@ var category = "none"
 var failure = 0
 var success = 0
 var chances = 3
+var wins = 0
+var loop_closure = false #im sorry mr ihlein
+var victory = null
 
 const NUM_CORRECT_OPTIONS = 3
 const NUM_BUTTONS = 16
 
 func _ready():
-	generate()
+	pass
 
 func generate():
+	button_list = []
 	success = 0
 	failure = 0
 	category = categories.pick_random()
@@ -64,6 +121,7 @@ func generate():
 		button_list.append(correct_list.pop_back())
 	for i in range(NUM_BUTTONS - NUM_CORRECT_OPTIONS):
 		button_list.append(other_list.pop_back())
+	print(button_list)
 
 	button_list.shuffle()
 	create_buttons()
@@ -99,49 +157,76 @@ func button_click(text, butt):
 		butt.get_theme_stylebox("disabled").bg_color = Color.GREEN
 		#set("theme_override_colors/icon_disabled_color", butt.Color.RED)
 		print("YES!")
+		$Panel/CorrectSOUND.play()
 		success = success + 1
+		butt.disabled = true
 	else:
 		butt.get_theme_stylebox("disabled").bg_color = Color.RED
 		butt.get_theme_stylebox("normal").bg_color = Color.RED
 		butt.get_theme_stylebox("hover").bg_color = Color.RED
 		#im done with this its not a bug its a feature now
 		print("NO. OH NO. NO NO NO.")
-		butt.disabled = true
+		for butts in butt_collection:
+			butts.disabled = true
 		$Panel/beegINCORRECT.visible = true
 		$Panel/IncorrectSOUND.play()
 		await get_tree().create_timer(1.0).timeout #WAIT!!!!
 		failure = failure + 1
-	butt.disabled = true
 
-func _process(_delta):
-	if success == 3:
-		#winner winner chicken dinner
-		print('congrat!!')
-		success = 0
-		for butt in butt_collection:
-			butt.queue_free()
-		butt_collection = []
-		generate()
-	elif failure == 1 and chances > 0:
-		#im gonna call you daniel cuz you suck
-		print('daniel sucks')
-		$Panel/beegINCORRECT.visible = false
-		for butt in butt_collection:
-			butt.get_theme_stylebox("disabled").bg_color = Color(0.1, 0.1, 0.1, 0.3)
-			butt.get_theme_stylebox("normal").bg_color = Color(0.1, 0.1, 0.1, 0.3)
-			butt.get_theme_stylebox("hover").bg_color = Color(0.1, 0.1, 0.1, 0.3)
-			butt.queue_free()
-		butt_collection = []
-		if chances == 3: #im sorry mr ihlien 
-			$Panel/Incorrect1.visible = true
-			chances = chances - 1
-			generate()
-		elif chances == 2:
-			$Panel/Incorrect2.visible = true
-			chances = chances - 1
-			generate()
-		elif chances == 1:
-			$Panel/Incorrect3.visible = true
-			chances = chances - 1
-			#game over, return something to server to indicate
-		
+func begin_minigame():
+	generate()
+	while loop_closure == false:
+		await get_tree().create_timer(0.01).timeout #godot cannot handle while loops alone
+		if success == 3:
+			#winner winner chicken dinner
+			print('congrat!!')
+			success = 0
+			wins = wins + 1
+			for butt in butt_collection:
+				butt.queue_free()
+			butt_collection = []
+			if wins == 3:
+				#winner, return dsomsrhting
+				victory = true
+				loop_closure = true
+			else:
+				generate()
+		elif failure == 1 and chances > 0:
+			#im gonna call you daniel cuz you suck
+			print('daniel sucks')
+			$Panel/beegINCORRECT.visible = false
+			for butt in butt_collection:
+				butt.get_theme_stylebox("disabled").bg_color = Color(0.1, 0.1, 0.1, 0.3)
+				butt.get_theme_stylebox("normal").bg_color = Color(0.1, 0.1, 0.1, 0.3)
+				butt.get_theme_stylebox("hover").bg_color = Color(0.1, 0.1, 0.1, 0.3)
+				butt.queue_free()
+			butt_collection = []
+			if chances == 3: #im sorry mr ihlien 
+				$Panel/Incorrect1.visible = true
+				chances = chances - 1
+				generate()
+			elif chances == 2:
+				$Panel/Incorrect2.visible = true
+				chances = chances - 1
+				generate()
+			elif chances == 1:
+				$Panel/Incorrect3.visible = true
+				chances = chances - 1
+				#game over, return something to server to indicate
+				victory = false
+				loop_closure = true
+	print("what the godot")
+
+
+func _on_button_pressed() -> void:
+	$Panel.set_visible(true)
+	$Panel2.set_visible(false)
+	await begin_minigame()
+	if victory == true:
+		$Panel2/RichTextLabel.text = 'you win'
+	elif victory == false:
+		$Panel2/RichTextLabel.text = 'you lose'
+	else:
+		$Panel2/RichTextLabel.text = 'uh oh'
+	$Panel.set_visible(false)
+	$Panel2.visible = true
