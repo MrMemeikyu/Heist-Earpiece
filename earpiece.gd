@@ -16,6 +16,20 @@ func _process(_delta: float) -> void:
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		while socket.get_available_packet_count():
 			log_message(socket.get_packet().get_string_from_ascii())
+	#moving here might have to change !!
+	if connected == true:
+		if Input.is_action_just_pressed('Up') == true:
+			var instruction = {"action":"move", "direction":"up"}
+			send(instruction)
+		if Input.is_action_just_pressed('Left') == true:
+			var instruction = {"action":"move", "direction":"left"}
+			send(instruction)
+		if Input.is_action_just_pressed('Down') == true:
+			var instruction = {"action":"move", "direction":"down"}
+			send(instruction)
+		if Input.is_action_just_pressed('Right') == true:
+			var instruction = {"action":"move", "direction":"right"}
+			send(instruction)
 
 func _exit_tree() -> void:
 	socket.close()
@@ -174,6 +188,19 @@ func button_click(text, butt):
 		failure = failure + 1
 
 func begin_minigame():
+	button_list = []
+	correct_list = []
+	other_list = []
+	butt_collection = []
+	category = "none"
+	failure = 0
+	success = 0
+	chances = 3
+	loop_closure = false #im sorry mr ihlein
+	victory = null
+	$Panel/Incorrect1.visible = false
+	$Panel/Incorrect2.visible = false
+	$Panel/Incorrect3.visible = false
 	generate()
 	while loop_closure == false:
 		await get_tree().create_timer(0.01).timeout #godot cannot handle while loops alone
@@ -223,9 +250,9 @@ func _on_button_pressed() -> void:
 	$Panel2.set_visible(false)
 	await begin_minigame()
 	if victory == true:
-		$Panel2/RichTextLabel.text = 'you win'
+		$Panel2/RichTextLabel.text = 'Minigame: Success'
 	elif victory == false:
-		$Panel2/RichTextLabel.text = 'you lose'
+		$Panel2/RichTextLabel.text = 'Minigame: YOU SUCK!!!!!!'
 	else:
 		$Panel2/RichTextLabel.text = 'uh oh'
 	$Panel.set_visible(false)
