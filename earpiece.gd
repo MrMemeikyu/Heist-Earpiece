@@ -5,6 +5,9 @@ var client_type = "godot"
 var role = "earpiece"
 var socket := WebSocketPeer.new()
 var connected := false
+var cabinet_nearby = false
+var blueprint_nearby = false
+var targetID = null
 
 func log_message(message: String) -> void:
 	var time := "[color=#aaaaaa] %s |[/color] " % Time.get_time_string_from_system()
@@ -15,7 +18,32 @@ func _process(_delta: float) -> void:
 
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		while socket.get_available_packet_count():
-			log_message(socket.get_packet().get_string_from_ascii())
+			var server_message = socket.get_packet().get_string_from_ascii()
+			var server_response = JSON.new()
+			if server_response.parse(server_message) == OK:
+				var response = server_response.data
+				if response["type"] == "environment":
+					var env = response["response"]
+					for space in env:
+						if space["type"] == ("file"): #chance
+							var targetFile = int(space["id"])
+							var templateAction = "There is file cabinet with id %s in the direction %s"
+							var currentAction = templateAction % [targetFile,space["direction"]]
+							print(currentAction)
+							cabinet_nearby = true
+							targetID = targetFile
+						else:
+							cabinet_nearby = false
+						if space["type"] == ("blueprint"): #is it blueprint?
+							var targetBlue = int(space["id"])
+							var templateAction = "There is blueprint with id %s in the direction %s"
+							var currentAction = templateAction % [targetBlue,space["direction"]]
+							print(currentAction)
+							blueprint_nearby = true
+							targetID = targetBlue
+						else:
+							blueprint_nearby = false
+	
 	#moving here might have to change !!
 	if connected == true:
 		if Input.is_action_just_pressed('Up') == true:
@@ -30,6 +58,11 @@ func _process(_delta: float) -> void:
 		if Input.is_action_just_pressed('Right') == true:
 			var instruction = {"action":"move", "direction":"right"}
 			send(instruction)
+	
+	if cabinet_nearby == true:
+		$Panel2/Button.set_visible(true)
+	else:
+		$Panel2/Button.set_visible(false)
 
 func _exit_tree() -> void:
 	socket.close()
@@ -187,7 +220,7 @@ func button_click(text, butt):
 		await get_tree().create_timer(1.0).timeout #WAIT!!!!
 		failure = failure + 1
 
-func begin_minigame():
+func begin_minigame(type):
 	button_list = []
 	correct_list = []
 	other_list = []
@@ -212,7 +245,7 @@ func begin_minigame():
 			for butt in butt_collection:
 				butt.queue_free()
 			butt_collection = []
-			if wins == 3:
+			if wins == 1:
 				#winner, return dsomsrhting
 				victory = true
 				loop_closure = true
@@ -246,11 +279,17 @@ func begin_minigame():
 
 
 func _on_button_pressed() -> void:
+	var type = ''
 	$Panel.set_visible(true)
 	$Panel2.set_visible(false)
-	await begin_minigame()
+	if cabinet_nearby == true:
+		type = 'cabinet'
+	elif blueprint_nearby == true:
+		type = 'blueprint'
+	await begin_minigame(type)
 	if victory == true:
 		$Panel2/RichTextLabel.text = 'Minigame: Success'
+		#use(targetID)
 	elif victory == false:
 		$Panel2/RichTextLabel.text = 'Minigame: YOU SUCK!!!!!!'
 	else:

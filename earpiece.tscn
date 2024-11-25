@@ -132,37 +132,7 @@ offset_right = 336.0
 offset_bottom = 211.0
 text = "gameplay"
 
-[node name="Button2" type="Button" parent="Panel2"]
-layout_mode = 0
-offset_left = 920.0
-offset_top = 28.0
-offset_right = 1116.0
-offset_bottom = 59.0
-text = "Open guard information"
-
-[node name="Button3" type="Button" parent="Panel2"]
-layout_mode = 0
-offset_left = 923.0
-offset_top = 87.0
-offset_right = 1104.0
-offset_bottom = 118.0
-text = "View camera addresses"
-
-[node name="Button4" type="Button" parent="Panel2"]
-layout_mode = 0
-offset_left = 934.0
-offset_top = 150.0
-offset_right = 1117.0
-offset_bottom = 211.0
-text = "serial numbers"
-
-[node name="Button5" type="Button" parent="Panel2"]
-layout_mode = 0
-offset_left = 976.0
-offset_top = 243.0
-offset_right = 1071.0
-offset_bottom = 274.0
-text = "Need help?"
+[node name="TileMapLayer" type="TileMapLayer" parent="Panel2"]
 
 [node name="Connection_Panel" type="Panel" parent="."]
 offset_right = 1162.0
