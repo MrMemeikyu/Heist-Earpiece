@@ -125,6 +125,7 @@ offset_right = 723.0
 offset_bottom = 80.0
 
 [node name="Button" type="Button" parent="Panel2"]
+visible = false
 layout_mode = 0
 offset_left = 150.0
 offset_top = 112.0
@@ -133,6 +134,13 @@ offset_bottom = 211.0
 text = "gameplay"
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Panel2"]
+
+[node name="Guard_Details" type="RichTextLabel" parent="Panel2"]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 30.0
+offset_right = 1125.0
+offset_bottom = 635.0
 
 [node name="Connection_Panel" type="Panel" parent="."]
 offset_right = 1162.0

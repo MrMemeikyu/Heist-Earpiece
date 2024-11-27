@@ -26,14 +26,12 @@ func _process(_delta: float) -> void:
 					var env = response["response"]
 					for space in env:
 						if space["type"] == ("file"): #chance
+							$Panel2/Button.set_visible(true)
 							var targetFile = int(space["id"])
 							var templateAction = "There is file cabinet with id %s in the direction %s"
 							var currentAction = templateAction % [targetFile,space["direction"]]
 							print(currentAction)
-							cabinet_nearby = true
 							targetID = targetFile
-						else:
-							cabinet_nearby = false
 						if space["type"] == ("blueprint"): #is it blueprint?
 							var targetBlue = int(space["id"])
 							var templateAction = "There is blueprint with id %s in the direction %s"
@@ -43,26 +41,31 @@ func _process(_delta: float) -> void:
 							targetID = targetBlue
 						else:
 							blueprint_nearby = false
+				#elif response["type"] == "earpiece_info": #"id", "data"
+					#for info in response:
+						#var guard = response["data"]
+						#print(guard)
+						#for i in guard:
+							#print(i)
 	
 	#moving here might have to change !!
 	if connected == true:
 		if Input.is_action_just_pressed('Up') == true:
+			$Panel2/Button.set_visible(false)
 			var instruction = {"action":"move", "direction":"up"}
 			send(instruction)
 		if Input.is_action_just_pressed('Left') == true:
+			$Panel2/Button.set_visible(false)
 			var instruction = {"action":"move", "direction":"left"}
 			send(instruction)
 		if Input.is_action_just_pressed('Down') == true:
+			$Panel2/Button.set_visible(false)
 			var instruction = {"action":"move", "direction":"down"}
 			send(instruction)
 		if Input.is_action_just_pressed('Right') == true:
+			$Panel2/Button.set_visible(false)
 			var instruction = {"action":"move", "direction":"right"}
 			send(instruction)
-	
-	if cabinet_nearby == true:
-		$Panel2/Button.set_visible(true)
-	else:
-		$Panel2/Button.set_visible(false)
 
 func _exit_tree() -> void:
 	socket.close()
@@ -289,7 +292,7 @@ func _on_button_pressed() -> void:
 	await begin_minigame(type)
 	if victory == true:
 		$Panel2/RichTextLabel.text = 'Minigame: Success'
-		#use(targetID)
+		send({"action":"use", "item":targetID})
 	elif victory == false:
 		$Panel2/RichTextLabel.text = 'Minigame: YOU SUCK!!!!!!'
 	else:
