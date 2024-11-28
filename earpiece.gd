@@ -41,12 +41,18 @@ func _process(_delta: float) -> void:
 							targetID = targetBlue
 						else:
 							blueprint_nearby = false
-				#elif response["type"] == "earpiece_info": #"id", "data"
+				elif response["type"] == "earpiece_info": #"id", "data"
 					#for info in response:
-						#var guard = response["data"]
-						#print(guard)
-						#for i in guard:
-							#print(i)
+					var guards = response["data"]
+					var guard_collection = 'Guards:\n'
+					for guard in guards:
+						print(guard)
+						var guard_id = int(guard["guard_id"])
+						var guard_name = guard["guard_name"]
+						var guardData = "Guard ID: %s- Name: %s"
+						var guardDisplay = guardData % [guard_id,guard_name]
+						guard_collection = guard_collection + str(guardDisplay) + "\n"
+					$Panel2/Guard_Details.set_text(guard_collection)
 	
 	#moving here might have to change !!
 	if connected == true:
