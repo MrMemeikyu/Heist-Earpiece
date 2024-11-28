@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://btt1sfklqf4sh"]
+[gd_scene load_steps=8 format=3 uid="uid://btt1sfklqf4sh"]
 
 [ext_resource type="Script" path="res://earpiece.gd" id="1_b3utm"]
 [ext_resource type="Texture2D" uid="uid://cl4rbtq7ty3sq" path="res://Mao Getty Image.jpg" id="2_g6mvs"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bqwnxbu2eg15w" path="res://Incorrect.png" id="4_hkyog"]
 [ext_resource type="AudioStream" uid="uid://dumtx4203p2cr" path="res://incorrect.ogg" id="5_nwqbv"]
 [ext_resource type="AudioStream" uid="uid://b1uoi0avicfvo" path="res://correct.ogg" id="6_j3a5c"]
+[ext_resource type="Texture2D" uid="uid://bk522vmpx7ym8" path="res://wasd_icon.png" id="7_mvndx"]
 
 [node name="Earpiece" type="Node2D"]
 script = ExtResource("1_b3utm")
@@ -141,6 +142,18 @@ offset_left = 800.0
 offset_top = 30.0
 offset_right = 1125.0
 offset_bottom = 635.0
+
+[node name="Lock_Details" type="RichTextLabel" parent="Panel2"]
+layout_mode = 0
+offset_left = 412.0
+offset_top = 295.0
+offset_right = 820.0
+offset_bottom = 628.0
+
+[node name="WasdIcon" type="Sprite2D" parent="Panel2"]
+position = Vector2(145, 519)
+scale = Vector2(0.233135, 0.233135)
+texture = ExtResource("7_mvndx")
 
 [node name="Connection_Panel" type="Panel" parent="."]
 offset_right = 1162.0
