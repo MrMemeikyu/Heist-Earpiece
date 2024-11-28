@@ -27,29 +27,33 @@ func _process(_delta: float) -> void:
                     var env = response["response"]
                     #needs to check if use is available
                     for space in env:
-                        if space["type"] == ("file"): #chance
-                            $Panel2/Button.set_visible(true)
-                            var targetFile = int(space["id"])
-                            var templateAction = "There is file cabinet with id %s in the direction %s"
-                            var currentAction = templateAction % [targetFile,space["direction"]]
-                            print(currentAction)
-                            targetID = targetFile
-                        if space["type"] == ("blueprint"): #is it blueprint?
-                            $Panel2/Button.set_visible(true)
-                            var targetBlue = int(space["id"])
-                            var templateAction = "There is blueprint with id %s in the direction %s"
-                            var currentAction = templateAction % [targetBlue,space["direction"]]
-                            print(currentAction)
-                            blueprint_nearby = true
-                            targetID = targetBlue
-                        if space["type"] == "computer":
-                            $Panel2/Button.set_visible(true)
-                            var targetTerminal = int(space["id"])
-                            var templateAction = "There is a computer with id %s in the direction %s"
-                            var currentAction = templateAction % [targetTerminal,space["direction"]]
-                            print(currentAction)
-                            terminal_nearby = true
-                            targetID = targetTerminal
+                        if "use" in space["actions"]:
+                            if space["type"] == ("file"): #chance
+                                $Panel2/Button.set_visible(true)
+                                $Panel2/Button.set_text("Access Employee Files")
+                                var targetFile = int(space["id"])
+                                var templateAction = "There is file cabinet with id %s in the direction %s"
+                                var currentAction = templateAction % [targetFile,space["direction"]]
+                                print(currentAction)
+                                targetID = targetFile
+                            if space["type"] == ("blueprint"): #is it blueprint?
+                                $Panel2/Button.set_visible(true)
+                                $Panel2/Button.set_text("Access Security Info")
+                                var targetBlue = int(space["id"])
+                                var templateAction = "There is blueprint with id %s in the direction %s"
+                                var currentAction = templateAction % [targetBlue,space["direction"]]
+                                print(currentAction)
+                                blueprint_nearby = true
+                                targetID = targetBlue
+                            if space["type"] == "computer":
+                                $Panel2/Button.set_visible(true)
+                                $Panel2/Button.set_text("Access Network Diagram")
+                                var targetTerminal = int(space["id"])
+                                var templateAction = "There is a computer with id %s in the direction %s"
+                                var currentAction = templateAction % [targetTerminal,space["direction"]]
+                                print(currentAction)
+                                terminal_nearby = true
+                                targetID = targetTerminal
                 elif response["type"] == "earpiece_info": #"id", "data"
                     print("Got earpiece info")
                     var data = response["data"]
@@ -73,6 +77,11 @@ func _process(_delta: float) -> void:
                             var serial_display = serial_data % [serial_num, brand]
                             lock_collection = lock_collection + str(serial_display) + "\n"
                         $Panel2/Lock_Details.set_text(lock_collection)
+                    elif "mac_address" in response["data"][0]:
+                        $Panel2/Hack_Details.update_look(response["data"])
+                        $Panel2/Hack_Details.visible = true
+                        $Panel2/HackMapLabel.visible = true
+                        $Panel2/MapBackground.visible = true
                         
     #moving here might have to change !!
     if connected == true:

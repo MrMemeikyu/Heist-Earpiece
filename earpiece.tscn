@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://btt1sfklqf4sh"]
+[gd_scene load_steps=9 format=3 uid="uid://btt1sfklqf4sh"]
 
 [ext_resource type="Script" path="res://earpiece.gd" id="1_b3utm"]
 [ext_resource type="Texture2D" uid="uid://cl4rbtq7ty3sq" path="res://Mao Getty Image.jpg" id="2_g6mvs"]
@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://dumtx4203p2cr" path="res://incorrect.ogg" id="5_nwqbv"]
 [ext_resource type="AudioStream" uid="uid://b1uoi0avicfvo" path="res://correct.ogg" id="6_j3a5c"]
 [ext_resource type="Texture2D" uid="uid://bk522vmpx7ym8" path="res://wasd_icon.png" id="7_mvndx"]
+[ext_resource type="PackedScene" uid="uid://bs47x1cku07xq" path="res://tile_map_layer.tscn" id="8_qjww2"]
 
 [node name="Earpiece" type="Node2D"]
 script = ExtResource("1_b3utm")
@@ -126,15 +127,12 @@ offset_right = 723.0
 offset_bottom = 80.0
 
 [node name="Button" type="Button" parent="Panel2"]
-visible = false
 layout_mode = 0
-offset_left = 150.0
-offset_top = 112.0
-offset_right = 336.0
-offset_bottom = 211.0
+offset_left = 458.0
+offset_top = 31.0
+offset_right = 644.0
+offset_bottom = 130.0
 text = "gameplay"
-
-[node name="TileMapLayer" type="TileMapLayer" parent="Panel2"]
 
 [node name="Guard_Details" type="RichTextLabel" parent="Panel2"]
 layout_mode = 0
@@ -154,6 +152,27 @@ offset_bottom = 628.0
 position = Vector2(145, 519)
 scale = Vector2(0.233135, 0.233135)
 texture = ExtResource("7_mvndx")
+
+[node name="MapBackground" type="ColorRect" parent="Panel2"]
+visible = false
+layout_mode = 0
+offset_left = 105.0
+offset_top = 105.0
+offset_right = 705.0
+offset_bottom = 425.0
+color = Color(0, 0, 0, 1)
+
+[node name="Hack_Details" parent="Panel2" instance=ExtResource("8_qjww2")]
+visible = false
+position = Vector2(105, 105)
+
+[node name="HackMapLabel" type="Label" parent="Panel2"]
+layout_mode = 0
+offset_left = 95.0
+offset_top = 71.0
+offset_right = 135.0
+offset_bottom = 94.0
+text = "Hacking Data"
 
 [node name="Connection_Panel" type="Panel" parent="."]
 offset_right = 1162.0
